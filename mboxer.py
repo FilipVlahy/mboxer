@@ -75,7 +75,7 @@ def method_read(headers):
     try:
         with open(f'{headers["Mailbox"]}/{headers["Message"]}', 'r') as file:
             reply_content = file.read()
-            reply_header = (f'Content-length:{len(reply_content)}\n')
+            reply_header = f'Content-length:{len(reply_content)}\n'
     
     except KeyError:
         status_code, status_message = (200, 'Bad request')
