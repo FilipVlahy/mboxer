@@ -141,6 +141,7 @@ while True:
         while True:
 
             method = f.readline()
+            method = method.strip()
 
             if not method:
                 break
