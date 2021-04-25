@@ -47,7 +47,7 @@ def method_write(headers, f):
 
     try:
         f_content = f.read(int(headers['Content-length']))
-        m.update(f_content.endoce('utf-8'))
+        m.update(f_content.encode('utf-8'))
         f_name= m.hexdigest()
 
         with open(f'{headers["Mailbox"]}/{f_name}','w') as file:
@@ -75,7 +75,7 @@ def method_read(headers):
     try:
         with open(f'{headers["Mailbox"]}/{headers["Message"]}', 'r') as file:
             reply_content = file.read()
-            reply_header = f'Content-length:{len(reply_content)}\n'
+            reply_header = (f'Content-length:{len(reply_content)}\n')
     
     except KeyError:
         status_code, status_message = (200, 'Bad request')
@@ -86,7 +86,7 @@ def method_read(headers):
     except OSError:
         status_code, status_message = (202, 'Read error')
 
-    return status_code, status_message, reply_header, reply_header
+    return status_code, status_message, reply_header, reply_content
 
 def method_ls(headers):
 
