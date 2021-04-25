@@ -132,7 +132,7 @@ while True:
 
     client_socket, client_adress = s.accept()
     print(f'Connection with {client_adress}')
-    pid_chid=os.fork()
+    pid_child=os.fork()
 
     if pid_child == 0:
         s.close()
