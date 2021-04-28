@@ -176,6 +176,7 @@ while True:
             f.write(f'{reply_header}\n')
             f.flush()
             f.write(f'{reply_content}')
+            f.flush()
 
         print(f'{client_adress} connection ended')
         sys.exit(0)
