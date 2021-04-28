@@ -62,6 +62,9 @@ def method_write(headers, f):
     except FileNotFoundError:
         status_code, status_message = (203, 'No such mailbox')
 
+    f_content = ''
+    f_name = ''
+    
     return status_code, status_message, f_name, f_content
 
 def method_read(headers):
