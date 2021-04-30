@@ -101,6 +101,7 @@ def method_ls(headers):
 
     try:
         dir = os.listdir(headers["Mailbox"])
+        dir = sorted(dir, reverse=True)
         reply_header = f'Number-of-messages:{len(dir)}\n'
         reply_content = '\n'.join(dir)+ '\n'
 
