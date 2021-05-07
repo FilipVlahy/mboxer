@@ -179,7 +179,7 @@ while True:
 
             if type(reply_content)==str:
                 f.write(f'{reply_content}'.encode('utf-8'))
-            else:
+            if type(reply_content)==bytes:
                 f.write(reply_content)
 
             f.flush()
