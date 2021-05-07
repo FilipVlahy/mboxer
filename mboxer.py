@@ -47,10 +47,10 @@ def method_write(headers, f):
 
     try:
         f_content = f.read(int(headers['Content-length']))
-        m.update(f_content.encode('utf-8'))
+        m.update(f_content)
         f_name= m.hexdigest()
 
-        with open(f'{headers["Mailbox"]}/{f_name}','w') as file:
+        with open(f'{headers["Mailbox"]}/{f_name}','wb') as file:
             file.write(f_content)
     
     except KeyError:
@@ -62,10 +62,10 @@ def method_write(headers, f):
     except FileNotFoundError:
         status_code, status_message = (203, 'No such mailbox')
 
-    f_content = ''
-    f_name = ''
+    reply_header = ''
+    reply_content = ''.encode('utf-8')
     
-    return status_code, status_message, f_name, f_content
+    return status_code, status_message, reply_header, reply_content
 
 def method_read(headers):
 
@@ -76,7 +76,7 @@ def method_read(headers):
     reply_content = ''
 
     try:
-        with open(f'{headers["Mailbox"]}/{headers["Message"]}', 'r') as file:
+        with open(f'{headers["Mailbox"]}/{headers["Message"]}', 'rb') as file:
             reply_content = file.read()
             reply_header = f'Content-length:{len(reply_content)}\n'
     
@@ -103,7 +103,7 @@ def method_ls(headers):
         dir = os.listdir(headers["Mailbox"])
         dir = sorted(dir, reverse=True)
         reply_header = f'Number-of-messages:{len(dir)}\n'
-        reply_content = '\n'.join(dir)+ '\n'
+        reply_content = ('\n'.join(dir)+ '\n').encode('utf-8')
 
     except KeyError:
         status_code, status_message = (200, 'Bad request')
@@ -140,23 +140,23 @@ while True:
 
     if pid_child == 0:
         s.close()
-        f = client_socket.makefile('rw', encoding = 'utf-8')
+        f = client_socket.makefile('rwb')
 
         while True:
 
-            method = f.readline()
+            method = f.readline().decode('utf-8')
             method = method.strip()
 
             if not method:
                 break
 
-            header = f.readline()
+            header = f.readline().decode('utf-8')
 
             while header != '\n':
                 header_id, header_value = header_split(header)
                 headers[header_id] = header_value
 
-                header = f.readline()
+                header = f.readline().decode('utf-8')
             
             print(f'method: {method}')
 
@@ -169,17 +169,19 @@ while True:
             else:
                 status_code, status_message = (204, 'Unknown method')
 
-                f.write(f'{status_code} {status_message}\n\n')
-                f.flush()
-                print('\n\n')
+                f.write(f'{status_code} {status_message}\n\n'.encode('utf-8'))
                 f.flush()
                 sys.exit(0)
             
-            f.write(f'{status_code} {status_message}\n')
+            f.write(f'{status_code} {status_message}\n'.encode('utf-8'))
+            f.write(f'{reply_header}\n'.encode('utf-8'))
             f.flush()
-            f.write(f'{reply_header}\n')
-            f.flush()
-            f.write(f'{reply_content}')
+
+            if type(reply_content)==str:
+                f.write(f'{reply_content}'.encode('utf-8'))
+            else:
+                f.write(reply_content)
+
             f.flush()
 
         print(f'{client_adress} connection ended')
